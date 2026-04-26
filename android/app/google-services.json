@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "1006549744478",
+    "project_id": "routemate-f2a00",
+    "storage_bucket": "routemate-f2a00.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006549744478:android:0b38e4bb66b672ae39edcf",
+        "android_client_info": {
+          "package_name": "com.example.routematedriver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdM8UygLjsNXF_g3iPG64U7LWxi_25YU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006549744478:android:7c3aa6938658beb539edcf",
+        "android_client_info": {
+          "package_name": "com.itechwave.routemate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdM8UygLjsNXF_g3iPG64U7LWxi_25YU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1006549744478:android:4eefeece66ab6cf339edcf",
+        "android_client_info": {
+          "package_name": "com.itechwave.routematedriver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdM8UygLjsNXF_g3iPG64U7LWxi_25YU0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
