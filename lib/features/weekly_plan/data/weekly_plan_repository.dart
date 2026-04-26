@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
+import '../../../../shared/utils/date_utils.dart';
 import '../domain/visit.dart';
 import '../domain/weekly_plan.dart';
 
@@ -11,21 +11,18 @@ class WeeklyPlanRepository {
 
   Future<WeeklyPlan?> fetchPlan(String driverUid) async {
     final now = DateTime.now().toUtc();
-    final monday = now.subtract(Duration(days: now.weekday - 1));
-    final fmt = DateFormat('yyyy-MM-dd');
-    final thisWeekStart = fmt.format(monday);
-    final nextWeekStart = fmt.format(monday.add(const Duration(days: 7)));
+    final thisWeek = weekStartFor(now);
+    final nextWeek = nextWeekStart();
 
     // Try next week first, fall back to current week
     final nextWeekQuery = await _firestore
         .collection('weekly_plans')
         .where('driver_uid', isEqualTo: driverUid)
-        .where('week_start', isEqualTo: nextWeekStart)
+        .where('week_start', isEqualTo: nextWeek)
         .limit(1)
         .get();
 
-    final weekStart =
-        nextWeekQuery.docs.isNotEmpty ? nextWeekStart : thisWeekStart;
+    final weekStart = nextWeekQuery.docs.isNotEmpty ? nextWeek : thisWeek;
 
     final query = await _firestore
         .collection('weekly_plans')
@@ -49,8 +46,7 @@ class WeeklyPlanRepository {
               .collection('accounts')
               .doc(visit.accountId)
               .get();
-          final address =
-              accountDoc.data()?['address'] as String? ?? '';
+          final address = accountDoc.data()?['address'] as String? ?? '';
           return visit.copyWith(address: address);
         } catch (_) {
           return visit;
@@ -60,12 +56,33 @@ class WeeklyPlanRepository {
     return plan.copyWith(visits: enriched);
   }
 
+  /// Atomically reads the Firestore document, flips the matching visit's
+  /// completed flag to true, and writes the full visits array back.
   Future<void> markVisitComplete(
     String planId,
-    List<Visit> updatedVisits,
+    String accountId,
+    String date,
   ) async {
-    await _firestore.collection('weekly_plans').doc(planId).update({
-      'visits': updatedVisits.map((v) => v.toMap()).toList(),
+    final docRef = _firestore.collection('weekly_plans').doc(planId);
+    await _firestore.runTransaction((tx) async {
+      final snap = await tx.get(docRef);
+      if (!snap.exists || snap.data() == null) return;
+
+      final rawVisits = snap.data()!['visits'] as List<dynamic>? ?? [];
+      final visits = rawVisits
+          .map((v) => Visit.fromMap(v as Map<String, dynamic>))
+          .toList();
+
+      final updated = visits.map((v) {
+        if (v.accountId == accountId && v.date == date) {
+          return v.copyWith(completed: true);
+        }
+        return v;
+      }).toList();
+
+      tx.update(docRef, {
+        'visits': updated.map((v) => v.toMap()).toList(),
+      });
     });
   }
 }
