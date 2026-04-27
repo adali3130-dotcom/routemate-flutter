@@ -49,6 +49,9 @@ dependencies:
   # Maps / URLs
   url_launcher: ^6.3.1
 
+  # HTTP (Cloud Function calls)
+  http: ^1.6.0
+
   # Date formatting
   intl: ^0.20.2
 
