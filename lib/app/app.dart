@@ -1,13 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/auth/providers/auth_providers.dart';
+import '../features/location/providers/location_providers.dart';
 import 'router.dart';
 
-class App extends ConsumerWidget {
+class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<App> createState() => _AppState();
+}
+
+class _AppState extends ConsumerState<App> {
+  @override
+  void initState() {
+    super.initState();
+    ref.listenManual(authStateProvider, (previous, next) {
+      final user = next.value;
+      final locationService = ref.read(locationServiceProvider);
+      if (user != null && user.email != null) {
+        locationService.start(user.email!);
+      } else {
+        locationService.stop();
+      }
+    }, fireImmediately: true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(routerProvider);
     return MaterialApp.router(
       title: 'RouteMate',
